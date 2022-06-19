@@ -5,23 +5,37 @@
     <link rel="stylesheet" href="./index.css">
     <script type="text/javascript" src="./index.js"></script>
     <script type="text/javascript" src="./libs/crypto-js.js"></script>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
   </head>
-  <body>
+  <body onload="setup()">
     <div class="app">
       <nav class="nav">
-        <label for="address">Address</label>
-        <input type="text" id="address" value="localhost">
-        <span>:</span>
-        <input type="text" id="port" value="3001">
-        <label for="username">Username</label>
-        <input type="text" id="username" value="anon">
-        <label for="secret-key">Secret Key</label>
-        <input type="text" id="secret-key" value="chave secreta">
+        <div>
+          <label for="address">Address</label>
+          <input type="text" id="address" value="192.168.0.141">
+          <span>:</span>
+          <input type="text" id="port" value="3001">
+        </div>
+        <div>
+          <label for="username">Username</label>
+          <input type="text" id="username" value="anon">
+        </div>
+        <div>
+          <label for="secret-key">Secret Key</label>
+          <input type="text" id="secret-key" value="chave secreta">
+        </div>
         <button id="start" onclick="setupConnection()">Start</button>
       </nav>
-      <div id="chat"></div>
+      <div id="chat">
+        <div class="message-container hidden">
+          <div class="message-bubble">
+            <div class="body"></div>
+            <div class="username"></div>
+          </div>
+        </div>
+      </div>
       <div id="chat-control">
-        <input type="text" id="message-body">
+        <input disabled type="text" id="message-body">
         <button onclick="sendMessage()" disabled id="send">Send</button>
       </div>
     </div>

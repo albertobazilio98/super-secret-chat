@@ -4,13 +4,24 @@ let address
 let username
 let secretKey
 
-const addMessage = (message) => {
-  console.log(message)
-  const messageDiv = document.createElement('div')
-  messageDiv.classList.add('chat-message')
-  messageDiv.textContent = `${message.username}: ${message.body}`
-  const chat = document.getElementById('chat')
-  chat.appendChild(messageDiv)
+const setup = () => {
+  document.getElementById('username').value = `anon-${Math.floor(Math.random() * (9999 - 1000 + 1) + 1000)}`
+
+  document.getElementById('message-body').addEventListener('keypress', (e) => {
+    if (e.key == 'Enter') sendMessage()
+  })
+}
+
+const setupConnection = () => {
+  address = document.getElementById('address').value
+  port = document.getElementById('port').value
+  username = document.getElementById('username').value
+  secretKey = document.getElementById('secret-key').value
+
+  document.getElementById('message-body').disabled = false
+  document.getElementById('send').disabled = false
+  socket = new WebSocket(`ws://${address}:${port}`)
+  socket.onmessage = recieveMessage
 }
 
 const calculateLRC = (message) => {
@@ -26,56 +37,63 @@ const calculateLRC = (message) => {
 }
 
 const checkLRC = (message, LRC) => {
-  console.log(LRC, message, calculateLRC(message))
   const result = LRC == calculateLRC(message)
-  if (!result) {
-    alert('integridade falhou!')
-  }
+  if (!result) alert('Integrity error!')
   return result
 }
 
 const encryptMessage = (message) => {
-  const encMessage = CryptoJS.AES.encrypt(message, secretKey).toString();
+  const encMessage = CryptoJS.AES.encrypt(JSON.stringify(message), secretKey).toString();
   return encMessage
 }
 
 const decryptMessage = (encMessage) => {
   const message = CryptoJS.AES.decrypt(encMessage, secretKey).toString(CryptoJS.enc.Utf8)
-  return message
+  if (!message) alert('Decriptation error!')
+  return JSON.parse(message)
+}
+
+const createMessageElement = (message) => {
+  const messageTemplate = document.querySelector('.message-container.hidden')
+  const newMessage = messageTemplate.cloneNode(true)
+  newMessage.querySelector('.body').textContent = message.body
+  newMessage.querySelector('.username').textContent = message.username
+  newMessage.classList.remove('hidden')
+  return newMessage
+}
+
+const addMessage = (message) => {
+  const newMessage = createMessageElement(message)
+  if (message.username != username) {
+    newMessage.classList.add('other')
+  }
+  // const messageDiv = document.createElement('div')
+  // messageDiv.classList.add('chat-message')
+  // messageDiv.textContent = `${message.username}: ${message.body}`
+  const chat = document.getElementById('chat')
+  chat.appendChild(newMessage)
 }
 
 const recieveMessage = (res) => {
   const message = res.data
-  console.log(message)
   const separator = message.lastIndexOf('-')
   const LRC = parseInt(message.slice(separator + 1))
   const encMessage = message.slice(0, separator)
 
   if (!checkLRC(encMessage, LRC)) return
-  console.log(decryptMessage(encMessage))
-  addMessage(JSON.parse(decryptMessage(encMessage)))
-}
 
-const setupConnection = () => {
-  address = document.getElementById('address').value
-  port = document.getElementById('port').value
-  username = document.getElementById('username').value
-  secretKey = document.getElementById('secret-key').value
-
-  document.getElementById('send').disabled = false
-  socket = new WebSocket(`ws://${address}:${port}`)
-  socket.onmessage = recieveMessage
+  addMessage(decryptMessage(encMessage))
 }
 
 const sendMessage = () => {
   if (!socket) return
-
-  const body = document.getElementById('message-body').value
+  const bodyInput = document.getElementById('message-body')
+  const body = bodyInput.value
   const message = {
     body, username,
   }
-  const encMessage = encryptMessage(JSON.stringify(message))
+  const encMessage = encryptMessage(message)
   const encMessageWithLCR = `${encMessage}-${calculateLRC(encMessage)}`
-  console.log(encMessageWithLCR)
   socket.send(encMessageWithLCR)
+  bodyInput.value = ''
 }
