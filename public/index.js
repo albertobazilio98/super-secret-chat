@@ -4,12 +4,18 @@ let address
 let username
 let secretKey
 
+const onEnterCallback = (e, action) => {
+  if (e.key == 'Enter') action()
+}
+
 const setup = () => {
   document.getElementById('username').value = `anon-${Math.floor(Math.random() * (9999 - 1000 + 1) + 1000)}`
 
-  document.getElementById('message-body').addEventListener('keypress', (e) => {
-    if (e.key == 'Enter') sendMessage()
-  })
+  document.getElementById('message-body').addEventListener('keypress', (e) => onEnterCallback(e, sendMessage))
+  document.getElementById('address').addEventListener('keypress', (e) => onEnterCallback(e, setupConnection))
+  document.getElementById('port').addEventListener('keypress', (e) => onEnterCallback(e, setupConnection))
+  document.getElementById('username').addEventListener('keypress', (e) => onEnterCallback(e, setupConnection))
+  document.getElementById('secret-key').addEventListener('keypress', (e) => onEnterCallback(e, setupConnection))
 }
 
 const setupConnection = () => {
@@ -67,9 +73,7 @@ const addMessage = (message) => {
   if (message.username != username) {
     newMessage.classList.add('other')
   }
-  // const messageDiv = document.createElement('div')
-  // messageDiv.classList.add('chat-message')
-  // messageDiv.textContent = `${message.username}: ${message.body}`
+
   const chat = document.getElementById('chat')
   chat.appendChild(newMessage)
 }
