@@ -8,8 +8,8 @@
 
 To download repository, open up terminal in desired folder and run
 ```bash
-$ git clone git@github.com:albertobazilio98/super-secret-chat.git
-$ cd super-secret-chat
+git clone git@github.com:albertobazilio98/super-secret-chat.git
+cd super-secret-chat
 ```
 
 ## Installation
@@ -29,5 +29,5 @@ bundle install
 Run
 
 ```bash
-$ ruby super_secret_chat.rb
+ruby super_secret_chat.rb
 ```
