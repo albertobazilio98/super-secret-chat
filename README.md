@@ -12,6 +12,18 @@ $ git clone git@github.com:albertobazilio98/super-secret-chat.git
 $ cd super-secret-chat
 ```
 
+## Installation
+
+install bundler for gem management
+```bash
+gem install bundler
+```
+
+intall other dependencies
+```bash
+bundle install
+```
+
 ## Usage
 
 Run
